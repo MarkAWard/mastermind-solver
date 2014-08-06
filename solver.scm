@@ -36,15 +36,21 @@
 
 
 (define (score cfg probe)
-  (cons (B-hits cfg probe) (W-hits cfg probe))
+  (list (B-hits cfg probe) (W-hits cfg probe))
 )
 
-(define (score-to-str scr) 
-  (string-append (make-string (car scr) #\B)
-		 (make-string (cdr scr) #\W)
-		 (make-string (- Num_pegs (+ (car scr) (cdr scr))) #\.)
+(define (score-to-str scr)
+  (let* ((x1 (car scr))
+	 (x2 (car (cdr scr)))
+	 (B (if (string? x1) (string->number x1) x1))
+	 (W (if (string? x2) (string->number x2) x2))
+	 )
+    (string-append (make-string B #\B) 
+		   (make-string W #\W)
+		   (make-string (- Num_pegs (+ B W )) #\.)
+		   )
+    )
   )
-)
 
 (define (create-pool)
   (apply cross (make-list Num_pegs (range Num_colors)))
@@ -74,10 +80,10 @@
 (define (solve max_turns probes)
   (let loop ((n max_turns) (pool probes))
     (cond 
-     [(null? probes) (inconsistent)]
-     [(= 1 (length probes)) (found-answer probes)]
+     [(null? pool) (inconsistent)]
+     [(= 1 (length pool)) (found-answer pool)]
      [(= 0 n) (too-hard)]
-     [else (loop (- n 1) (turn probes))]
+     [else (loop (- n 1) (turn pool))]
     )
   )
 )
@@ -85,8 +91,8 @@
 (define (turn probes)
   (let ((guess (get-guess probes)))
     (display guess)
-    (let ((curr_scr (get-score)))
-      (reduce-pool probes guess (score-to-str curr_scr))
+    (let ((curr_scr (score-to-str (get-score))))
+      (reduce-pool probes guess curr_scr)
     )
   )
 )
@@ -105,9 +111,9 @@
 
 (begin 
   (display "Enter the number of pegs for the code: ")
-  (define Num_pegs (read))
+  (define Num_pegs (string->number (read-line)))
   (display "Enter the number of symbols to pick from: ")
-  (define Num_colors (read))
+  (define Num_colors (string->number (read-line)))
   (display "The choices to create the code from are: ")
   (display (reverse (range Num_colors)))
   (newline)
