@@ -68,7 +68,7 @@
 
 ;each code in pool must produce the same score as the current favorite guess
 (define (reduce-pool probes cfg scr)
-  (filter (lambda (code) (string=? (score-to-str cfg code) scr) ) probes)
+  (filter (lambda (code) (string=? (score-to-str (score cfg code)) scr) ) probes)
 )
 
 (define (solve max_turns probes)
