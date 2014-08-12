@@ -1,3 +1,5 @@
+#lang racket
+
 ;apply operator right to left to reduce list 
 (define (fold-right op base lst)
   (if (null? lst)
